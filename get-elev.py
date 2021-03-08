@@ -19,6 +19,7 @@ from glob import glob
 from time import localtime, strftime
 import pandas as pd
 import numpy
+import math
 import sys
 import os
 
@@ -28,7 +29,7 @@ def toMeters(pixel):
 print("Running...")
 
 # get a list of files
-if len(sys.argv) == 1: # if the isn't an argument
+if len(sys.argv) == 1: # if there isn't an argument
     files = glob("*.tif") # get all the .tif files in the current directory
 
 elif sys.argv[1].find("*") != -1: # if the argument has a wildcard
@@ -49,10 +50,23 @@ toprights = []
 bottomlefts = []
 bottomrights = []
 
+# get the current time for use in some file/directory names
+timeNow = strftime("%Y-%m-%d_%H-%M-%S", localtime())
+
+# attempt to create a results directory
+resultsDirName = "results_" + timeNow
+os.mkdir(resultsDirName)
+
 for fileNum in range(0, len(files)):
+    # get the filename we're using
     filename = files[fileNum]
+    # redirect program output to stdout
     sys.stdout = orig_stdout
-    print(filename)
+
+    # print out a progress message
+    percentage = fileNum / (len(files) - 1) * 100
+    percentageString = "{:d}".format(math.floor(percentage))
+    print("[" + percentageString + "%] " + filename)
 
     # read image
     tif = Image.open(filename)
@@ -64,8 +78,12 @@ for fileNum in range(0, len(files)):
     # need a new array for the elevations since we overflow the type of the tifarr
     elevarr = numpy.array([[0] * width] * height)
 
-    # create a directory for the output
-    filename_noext = filename.rsplit('.', 1)[0]
+    # switch to the results directory
+    os.chdir(resultsDirName)
+
+    # extract just the filename, sans the path and extension
+    filename_noext = os.path.basename(filename).rsplit('.', 1)[0]
+    # attempt to create a directory for the output
     # catch and handle exceptions for if the file exists. Probably also catches
     #  other errors, but we're not going to think about that too much
     try:
@@ -118,7 +136,7 @@ for fileNum in range(0, len(files)):
         print("Bottom right: " + str(bottomright))
 
     # return to the original directory
-    os.chdir("..")
+    os.chdir("../..")
 
 # restore stdout
 sys.stdout = orig_stdout
@@ -131,6 +149,6 @@ stats = {"minimums": minimums,
          "bottomrights": bottomrights}
 
 df = pd.DataFrame(stats, index=names)
-df.to_csv("get-elev_all_stats_" + strftime("%Y-%m-%d_%H-%M-%S", localtime()) + ".csv")
+df.to_csv("get-elev_all_stats_" + timeNow + ".csv")
 
 print("Done!")
