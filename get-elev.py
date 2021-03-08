@@ -72,7 +72,6 @@ for fileNum in range(0, len(files)):
     tif = Image.open(filename)
     # convert to a 2d numpy array
     tifarr = numpy.array(tif)
-    # actually width - 1 and height - 1. makes the math easier, so suck it up
     width = len(tifarr[0])
     height = len(tifarr)
     # need a new array for the elevations since we overflow the type of the tifarr
