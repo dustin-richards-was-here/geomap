@@ -23,9 +23,6 @@ import math
 import sys
 import os
 
-def toMeters(pixel):
-    return (25/127) * ((29 * pixel) + 3781)
-
 print("Running...")
 
 # get a list of files
@@ -64,18 +61,17 @@ for fileNum in range(0, len(files)):
     sys.stdout = orig_stdout
 
     # print out a progress message
-    percentage = fileNum / (len(files) - 1) * 100
+    percentage = fileNum / (len(files)) * 100
     percentageString = "{:d}".format(math.floor(percentage))
     print("[" + percentageString + "%] " + filename)
 
     # read image
     tif = Image.open(filename)
     # convert to a 2d numpy array
-    tifarr = numpy.array(tif)
-    width = len(tifarr[0])
-    height = len(tifarr)
+    elevarr = numpy.array(tif)
+    width = len(elevarr[0])
+    height = len(elevarr)
     # need a new array for the elevations since we overflow the type of the tifarr
-    elevarr = numpy.array([[0] * width] * height)
 
     # switch to the results directory
     os.chdir(resultsDirName)
@@ -91,17 +87,11 @@ for fileNum in range(0, len(files)):
         print("Directory " + filename_noext + " exists, overwriting...")
     os.chdir(filename_noext)
 
-    # convert all the pixel values to meters
-    for i in range(0, height):
-        for j in range(0, width):
-            elevarr[i][j] = toMeters(tifarr[i][j])
-
     # output a csv with the raw elevation data
-    numpy.savetxt(filename_noext + "_elev.csv", elevarr, delimiter=",", fmt="%1u")
+    numpy.savetxt(filename_noext + ".csv", elevarr, delimiter=",", fmt="%1u")
 
-    # output a png copy of the tif input
-    png = Image.fromarray(tifarr)
-    png.save(filename_noext + ".png")
+    # output a raw copy of the tif input
+    numpy.savetxt(filename_noext + ".dat", elevarr, fmt="%1u")
 
     # get the elevations of the corners
     topleft = elevarr[0][0]
