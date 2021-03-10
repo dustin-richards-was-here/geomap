@@ -1,6 +1,6 @@
 // for SDSMT 3DPC geomap project by Dustin Richards, 2021-3
 
-infile  = "tileA_1_16bit_unsigned.dat"; // input heightmap
+infile  = "tileA_1_16bit_unsigned_shifted.dat"; // input heightmap
 stamp   = infile; // id to stamp on the bottom
 
 x_px    = 200;    // heightmap # of columns
@@ -21,7 +21,7 @@ z_scale = z_mm_per_m;
 stamp_depth = 0.5;
 
 difference() {
-    // , scale, and mirror the heightmap
+    // import, scale, and mirror the heightmap
     translate([0, y_size, 0])
         scale([x_scale, y_scale, z_scale])
         mirror([0, 1, 0])

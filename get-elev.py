@@ -67,11 +67,13 @@ for fileNum in range(0, len(files)):
 
     # read image
     tif = Image.open(filename)
+    # get width and height
+    width = tif.width
+    height = tif.height
     # convert to a 2d numpy array
     elevarr = numpy.array(tif)
-    width = len(elevarr[0])
-    height = len(elevarr)
-    # need a new array for the elevations since we overflow the type of the tifarr
+    # create an empty array for the output to OpenSCAD
+    scadarr = numpy.array([[0] * width] * height)
 
     # switch to the results directory
     os.chdir(resultsDirName)
@@ -90,8 +92,15 @@ for fileNum in range(0, len(files)):
     # output a csv with the raw elevation data
     numpy.savetxt(filename_noext + ".csv", elevarr, delimiter=",", fmt="%1u")
 
-    # output a raw copy of the tif input
-    numpy.savetxt(filename_noext + ".dat", elevarr, fmt="%1u")
+    # make a copy of the data with everything shifted down by (750 - 90) meters
+    #   750 = lowest value in range
+    #   90  = buffer to leave 3mm of plastic below lowest point
+    for i in range(0, height):
+        for j in range(0, width):
+            scadarr[i][j] = elevarr[i][j] - (750 - 90)
+
+    # output the shifted down data for OpenSCAD to use
+    numpy.savetxt(filename_noext + ".dat", scadarr, fmt="%1u")
 
     # get the elevations of the corners
     topleft = elevarr[0][0]
