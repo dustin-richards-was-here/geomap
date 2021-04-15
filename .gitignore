@@ -3,3 +3,5 @@ chips10k*
 *.csv
 old
 results*
+lithopane-testing
+*.swp

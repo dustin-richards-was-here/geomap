@@ -26,14 +26,23 @@ import os
 print("Running...")
 
 # get a list of files
+#if len(sys.argv) == 1: # if there isn't an argument
+#    files = glob("*.tif") # get all the .tif files in the current directory
+#
+#elif sys.argv[1].find("*") != -1: # if the argument has a wildcard
+#    files = glob(sys.argv[1]) # expand the wilcard
+#
+#elif len(sys.argv) > 1: # if there's a list of files
+#    files = sys.argv[1:len(sys.argv)].copy() # use the list of files
+
 if len(sys.argv) == 1: # if there isn't an argument
-    files = glob("*.tif") # get all the .tif files in the current directory
+    direc = "./"
+    print("this dir")
+elif len(sys.argv) == 2: # if there is a single argument, should be a directory containing the images
+    direc = sys.argv[1]
+    print("other dir")
 
-elif sys.argv[1].find("*") != -1: # if the argument has a wildcard
-    files = glob(sys.argv[1]) # expand the wilcard
-
-elif len(sys.argv) > 1: # if there's a list of files
-    files = sys.argv[1:len(sys.argv)].copy() # use the list of files
+direc += "/*.tif"
 
 # save a reference to stdout
 orig_stdout = sys.stdout
@@ -53,6 +62,16 @@ timeNow = strftime("%Y-%m-%d_%H-%M-%S", localtime())
 # attempt to create a results directory
 resultsDirName = "results_" + timeNow
 os.mkdir(resultsDirName)
+
+print("How many tile columns wide is the data set?")
+areaWidth = int(input())
+print("How many tile rows tall is the data set?")
+areaHeight = int(input())
+areaTotal = areaWidth * areaHeight
+print("Expecting " + str(areaTotal) + " tiles, checking directory...")
+files = glob(direc)
+print("Found " + str(len(files)) + " files in directory!")
+exit()
 
 for fileNum in range(0, len(files)):
     # get the filename we're using
