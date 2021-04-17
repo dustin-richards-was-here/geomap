@@ -2,7 +2,7 @@
 
 // ------ INPUT PARAMETERS ------
 //infile  = "tileA_1_16bit_unsigned_shifted.dat"; // input heightmap
-infile  = "../results_2021-04-04_21-53-39/tC_3/tC_3.dat"; // input heightmap
+infile  = "./results_2021-04-04_21-53-39_all_1x1/tM_10/tM_10.dat"; // input heightmap
 stamp   = infile; // id to stamp on the bottom
 
 x_px    = 334;    // heightmap # of columns
@@ -28,7 +28,7 @@ stamp_depth = 0.5;
 
 // size of legs
 leg_xy_size = 10;
-leg_hole_depth = 3;
+leg_hole_depth = 1;
 
 // locations of legs
 leg_offset = 10;
@@ -50,12 +50,13 @@ module map() {
     linear_extrude(stamp_depth)
       translate([x_size/2, y_size*2/3, 0])
       scale([0.5, 0.5, 1])
-      rotate([180, 0, 180])
+      rotate([180, 0, 0])
       text(stamp, halign="center", valign="center");
 
     // stamp an arrow in the bottom
     translate([x_size/2, y_size/3, 0])
       linear_extrude(stamp_depth)
+      rotate([0,0,180])
       arrow();
     
     // holes for legs
