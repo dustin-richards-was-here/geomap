@@ -2,12 +2,13 @@
 
 // ------ INPUT PARAMETERS ------
 //infile  = "tileA_1_16bit_unsigned_shifted.dat"; // input heightmap
-infile  = "./results_2021-04-04_21-53-39_all_1x1/tM_10/tM_10.dat"; // input heightmap
+//infile  = "./results_2021-04-04_21-53-39_all_1x1/tM_10/tM_10.dat"; // input heightmap
+infile  = "./test/test.dat"; // input heightmap
 stamp   = infile; // id to stamp on the bottom
 
-x_px    = 334;    // heightmap # of columns
-y_px    = 334;    // heightmap # of rows
-x_size  = 80;     // output model x side length, mm
+x_px    = 334 * 3;    // heightmap # of columns
+y_px    = 334 * 3;    // heightmap # of rows
+x_size  = 80 * 3;     // output model x side length, mm
 y_size  = x_size; // output model y side length, mm
 
 // how many scale model mm correspond to a real-world m
@@ -45,25 +46,6 @@ module map() {
       scale([x_scale, y_scale, z_scale])
       mirror([0, 1, 0])
       surface(file = infile, invert = false);
-
-    // stamp an id in the bottom
-    linear_extrude(stamp_depth)
-      translate([x_size/2, y_size*2/3, 0])
-      scale([0.5, 0.5, 1])
-      rotate([180, 0, 0])
-      text(stamp, halign="center", valign="center");
-
-    // stamp an arrow in the bottom
-    translate([x_size/2, y_size/3, 0])
-      linear_extrude(stamp_depth)
-      rotate([0,0,180])
-      arrow();
-    
-    // holes for legs
-    for (i = [0:3])
-    {
-      translate(leg_locs[i])leg_hole();
-    }
   }
 }
 
@@ -76,5 +58,6 @@ module leg_hole() {
   cube([leg_xy_size, leg_xy_size, leg_hole_depth], center=true);
 }
 
+//surface(file = infile, invert = false);
 map();
 //leg_hole();
