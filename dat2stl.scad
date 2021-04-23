@@ -1,15 +1,16 @@
 // for SDSMT 3DPC geomap project by Dustin Richards, 2021-3
 
 // ------ INPUT PARAMETERS ------
-//infile  = "tileA_1_16bit_unsigned_shifted.dat"; // input heightmap
-//infile  = "./results_2021-04-04_21-53-39_all_1x1/tM_10/tM_10.dat"; // input heightmap
-infile  = "./test/test.dat"; // input heightmap
+infile  = "./results_2021-04-21_21-04-26/supertile_tJ_13.dat"; // input heightmap
 stamp   = infile; // id to stamp on the bottom
 
-x_px    = 334 * 3;    // heightmap # of columns
-y_px    = 334 * 3;    // heightmap # of rows
-x_size  = 80 * 3;     // output model x side length, mm
-y_size  = x_size; // output model y side length, mm
+supertile_x = 3; // # of tiles in the width of a supertile
+supertile_y = 3; // # of tiles in the height of a supertile
+
+x_px    = 334 * supertile_x;    // heightmap # of columns
+y_px    = 334 * supertile_y;    // heightmap # of rows
+x_size  = 80 * supertile_x;     // output model x side length, mm
+y_size  = 80 * supertile_y;     // output model y side length, mm
 
 // how many scale model mm correspond to a real-world m
 z_mm_per_m = 0.1 / 3; // a single 0.1mm layer for 3m of z data
@@ -40,13 +41,11 @@ leg4_loc = [x_size-leg_offset, leg_offset, 0];        // bottom right
 leg_locs = [leg1_loc, leg2_loc, leg3_loc, leg4_loc];
 
 module map() {
-  difference() {
-    // import, scale, and mirror the heightmap
-    translate([0, y_size, 0])
-      scale([x_scale, y_scale, z_scale])
-      mirror([0, 1, 0])
-      surface(file = infile, invert = false);
-  }
+  // import, scale, and mirror the heightmap
+  translate([0, y_size, 0])
+    scale([x_scale, y_scale, z_scale])
+    mirror([0, 1, 0])
+    surface(file = infile, invert = false);
 }
 
 module arrow() polygon( points = [
@@ -58,6 +57,4 @@ module leg_hole() {
   cube([leg_xy_size, leg_xy_size, leg_hole_depth], center=true);
 }
 
-//surface(file = infile, invert = false);
 map();
-//leg_hole();
