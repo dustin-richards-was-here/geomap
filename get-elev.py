@@ -33,8 +33,8 @@ supertileWidth = 3
 supertileHeight = 3
 # how many units to leave on the bottom of a supertile, supertiles will be offset down so that this
 #  is the minimum value
-#  the .scad uses 0.1mm output per 3m input, so for a 3mm base, use 90 here
-supertileBaseHeight = 15 # 0.5 mm base
+#  the .scad uses 0.1mm output per 3m input, so for a 1mm base, use 30 here
+supertileBaseHeight = 30 # 1 mm base
 
 # ==== END OF USER DEFINED VARIABLES ====
 
@@ -190,7 +190,7 @@ for supertileFileRow in supertileFiles:
         supertileBaseName = resultsDirName + "/supertile_" + supertileName
         np.savetxt(supertileBaseName + ".dat", tempSupertileVals, fmt="%1u")
 
-        # run OpenSCAD to generate an stl
+        # run OpenSCAD to generate a tile stl
         print("Generating 3D model for supertile...")
         outfileArg = supertileBaseName + ".stl"
         supertileXArg = "supertile_x=" + str(supertileTilesX)
@@ -203,6 +203,10 @@ for supertileFileRow in supertileFiles:
             "-D", infileArg,
             "dat2stl.scad"])
         print("Done!")
+
+        # run OpenSCAD to generate a legs stl
+        print("Generating 3D model for legs...")
+
 
 exit()
 
