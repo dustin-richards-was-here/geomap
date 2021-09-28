@@ -181,6 +181,9 @@ for supertileFileRow in supertileFiles:
                 if tempSupertileVals[i][j] < min:
                     min = tempSupertileVals[i][j]
 
+        # offset is the value to remove from the supertile so we don't have a bunch of extra
+        #  plastic on the bottom. This is also the height used to generate legs with dat2legs.scad
+        #  so all supertiles will line up vertically.
         offset = min - supertileBaseHeight
         for i in range(len(tempSupertileVals)):
             for j in range(len(tempSupertileVals[0])):
@@ -206,7 +209,7 @@ for supertileFileRow in supertileFiles:
 
         # run OpenSCAD to generate a legs stl
         print("Generating 3D model for legs...")
-
+        
 
 exit()
 
