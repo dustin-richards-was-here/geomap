@@ -35,6 +35,8 @@ supertileHeight = 3
 #  is the minimum value
 #  the .scad uses 0.1mm output per 3m input, so for a 1mm base, use 30 here
 supertileBaseHeight = 30 # 1 mm base
+# any data points greater than this value will be set to 0
+outlierThreshold = 1000000
 
 # ==== END OF USER DEFINED VARIABLES ====
 
@@ -207,6 +209,9 @@ for supertileFileRow in supertileFiles:
         for i in range(len(tempSupertileVals)):
             for j in range(len(tempSupertileVals[0])):
                 tempSupertileVals[i][j] -= offset
+                # throw out outliers
+                if tempSupertileVals[i][j] > outlierThreshold:
+                    tempSupertileVals[i][j] = 0
     
         # save the supertile .dat
         supertileBaseName = resultsDirName + "/supertile_" + supertileName
