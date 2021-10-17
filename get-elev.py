@@ -1,15 +1,19 @@
+#!/usr/bin/python3
+
 # Author: Dustin Richards <richards.dustinb@gmail.com>
 # March 1, 2021
 # Extracts elevation data from a TIF file
-# version 1.1
+# version 1.4
 
 # assumes unsigned 16-bit gray .tif files
 
-# the simplest way to use this script is to drop it into a directory with a
-#   bunch of .tif files and double-click it
+# information on grid_file argument (gridCSVFile variable below):
+#  you must provide a csv file that contains the file names of all the tiles in the grid
+#  elements separated by commas, rows separated by newlines
+#  your favorite spreadsheet software should be able to generate this with the help of some functions
 
 # usage:
-# python3 get-elev.py [directory with .tif files]
+# python3 get-elev.py grid_file [directory with .tif files]
 
 from PIL import Image
 from glob import glob
@@ -23,10 +27,6 @@ import os
 
 # ==== THESE ARE USER DEFINED VARIABLES, EDIT THESE TO CUSTOMIZE THE OUTPUT ====
 
-# csv file that contains the file names of all the tiles in the grid
-#  elements separated by commas, rows separated by newlines
-#  your favorite spreadsheet software should be able to generate this with the help of some functions
-gridCSVFile = "./grid.csv" 
 # how many tiles wide a supertile should be
 supertileWidth = 3
 # how many tiles tall a supertile should be
@@ -37,6 +37,30 @@ supertileHeight = 3
 supertileBaseHeight = 30 # 1 mm base
 
 # ==== END OF USER DEFINED VARIABLES ====
+
+def printUsage():
+    print("Usage: ./get-elev.py grid_file [input_directory]")
+    print("See comments in script for details on how grid_file should be structured")
+    print("input_directory should be a directory containing 16-bit gray .tif files")
+    print("Files listed in grid_file MUST be in input_directory")
+
+# --- handle command line inputs ---
+numArgs = len(sys.argv)
+
+# check if first argument is present, grid specifier .csv
+if numArgs >= 2:
+    gridCSVFile = sys.argv[1]
+# if not, quit
+else:
+    printUsage()
+    exit()
+
+# check for a second argument, input directory
+if numArgs >= 3:
+    direc = sys.argv[2]
+# if none, assume current directory
+else:
+    direc = "./"
 
 print("Running...")
 
@@ -209,103 +233,3 @@ for supertileFileRow in supertileFiles:
 
         # run OpenSCAD to generate a legs stl
         print("Generating 3D model for legs...")
-        
-
-exit()
-
-for fileNum in range(0, len(files)):
-    # get the filename we're using
-    filename = files[fileNum]
-    # redirect program output to stdout
-    sys.stdout = orig_stdout
-
-    # print out a progress message
-    percentage = fileNum / (len(files)) * 100
-    percentageString = "{:d}".format(math.floor(percentage))
-    print("[" + percentageString + "%] " + filename)
-
-    # read image
-    tif = Image.open(filename)
-    # get width and height
-    width = tif.width
-    height = tif.height
-    # convert to a 2d numpy array
-    elevarr = np.array(tif)
-    # create an empty array for the output to OpenSCAD
-    scadarr = np.array([[0] * width] * height)
-
-    # switch to the results directory
-    os.chdir(resultsDirName)
-
-    # extract just the filename, sans the path and extension
-    filename_noext = os.path.basename(filename).rsplit('.', 1)[0]
-    # attempt to create a directory for the output
-    # catch and handle exceptions for if the file exists. Probably also catches
-    #  other errors, but we're not going to think about that too much
-    try:
-        os.mkdir(filename_noext)
-    except OSError as error:
-        print("Directory " + filename_noext + " exists, overwriting...")
-    os.chdir(filename_noext)
-
-    # output a csv with the raw elevation data
-    np.savetxt(filename_noext + ".csv", elevarr, delimiter=",", fmt="%1u")
-
-    # make a copy of the data with everything shifted down by (750 - 90) meters
-    #   750 = lowest value in range
-    #   90  = buffer to leave 3mm of plastic below lowest point
-    for i in range(0, height):
-        for j in range(0, width):
-            scadarr[i][j] = elevarr[i][j] - (750 - 90)
-
-    # output the shifted down data for OpenSCAD to use
-    np.savetxt(filename_noext + ".dat", scadarr, fmt="%1u")
-
-    # get the elevations of the corners
-    topleft = elevarr[0][0]
-    topright = elevarr[0][width-1]
-    bottomleft = elevarr[height-1][0]
-    bottomright = elevarr[height-1][width-1]
-
-    # get the min and max elevation
-    maximum = np.amax(elevarr)
-    minimum = np.amin(elevarr)
-
-    # store to the storage arrays
-    names.append(filename_noext)
-    toplefts.append(topleft)
-    toprights.append(topright)
-    bottomlefts.append(bottomleft)
-    bottomrights.append(bottomright)
-    maximums.append(maximum)
-    minimums.append(minimum)
-
-    # redirect print to stdout
-    with open(filename_noext + "_stats.txt", 'w') as f:
-        sys.stdout = f
-        print(filename_noext)
-        print("Units: meters")
-        print("Min: " + str(minimum))
-        print("Max: " + str(maximum))
-        print("Top left:  " + str(topleft))
-        print("Top right: " + str(topright))
-        print("Bottom left : " + str(bottomleft))
-        print("Bottom right: " + str(bottomright))
-
-    # return to the original directory
-    os.chdir("../..")
-
-# restore stdout
-sys.stdout = orig_stdout
-
-stats = {"minimums": minimums,
-         "maximums": maximums,
-         "toplefts": toplefts,
-         "toprights": toprights,
-         "bottomlefts": bottomlefts,
-         "bottomrights": bottomrights}
-
-df = pd.DataFrame(stats, index=names)
-df.to_csv("all_stats_" + timeNow + ".csv")
-
-print("Done!")
