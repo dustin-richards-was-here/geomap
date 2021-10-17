@@ -1,0 +1,6 @@
+Known bugs that seemed worth writing down:
+
+get-elev.py only works in these two cases:
+  1x1 grid specifier .csv
+  (>=2)x(>=2) grid specifier .csv
+  If one dimension is 1, but not the other, the script will fail

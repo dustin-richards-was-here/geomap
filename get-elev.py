@@ -66,8 +66,17 @@ print("Running...")
 
 # import the csv containing the files that form the terrain map grid
 gridChipsShort = np.genfromtxt(gridCSVFile, delimiter=',', dtype=str)
-gridWidth =  gridChipsShort.shape[1]
-gridHeight = gridChipsShort.shape[0]
+
+# grid size special case: 1x1
+if gridChipsShort.shape == ():
+    gridHeight = 1
+    gridWidth = 1
+    gridChipsTemp = gridChipsShort.item()
+    gridChipsShort = [["", ""],["", ""]]
+    gridChipsShort[0][0] = gridChipsTemp
+else:
+    gridWidth =  gridChipsShort.shape[1]
+    gridHeight = gridChipsShort.shape[0]
 
 # setup for supertile formation
 gridChips = [[0 for i in range(gridWidth)] for j in range(gridHeight)]
@@ -77,22 +86,8 @@ supertileFiles = [[0 for x in range(supertileGridWidth)] for y in range(supertil
 tileWidth = 0
 tileHeight = 0
 
-if len(sys.argv) == 1: # if there isn't an argument
-    direc = "./"
-elif len(sys.argv) == 2: # if there is a single argument, should be a directory containing the images
-    direc = sys.argv[1]
-
 # save a reference to stdout
 orig_stdout = sys.stdout
-
-# storage variables for pandas
-names = []
-maximums = []
-minimums = []
-toplefts = []
-toprights = []
-bottomlefts = []
-bottomrights = []
 
 # get the current time for use in some file/directory names
 timeNow = strftime("%Y-%m-%d_%H-%M-%S", localtime())
@@ -103,8 +98,8 @@ os.mkdir(resultsDirName)
 
 # makes sure all files listed in gridCSVFile are present in direc
 print("Checking that files listed in " + gridCSVFile + " are in " + direc + "...")
-for i in range(len(gridChipsShort)):
-    for j in range(len(gridChipsShort[0])):
+for i in range(gridHeight):
+    for j in range(gridWidth):
         fpath = direc + "/" + gridChipsShort[i][j]
         if not os.path.isfile(fpath):
             print("Error: " + fpath + " not found, exiting.")
