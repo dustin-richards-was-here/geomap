@@ -36,7 +36,10 @@ supertileHeight = 3
 #  the .scad uses 0.1mm output per 3m input, so for a 1mm base, use 30 here
 supertileBaseHeight = 30 # 1 mm base
 # any data points greater than this value will be set to 0
-outlierThreshold = 1000000
+outlierUpperThreshold = 1000000
+# any data points below this value will not be used to calculate the minimum of a supertile
+#  if your model is coming out with a large amount of unneeded material on the bottom, try raising this
+outlierLowerThreshold = 100
 
 # ==== END OF USER DEFINED VARIABLES ====
 
@@ -199,7 +202,8 @@ for supertileFileRow in supertileFiles:
                 tileCol = j % tileWidth
                 tempSupertileVals[i][j] = tempTileVals[row][col][tileRow][tileCol]
                 # track the minimum value in the supertile
-                if tempSupertileVals[i][j] < min:
+                #  only count value above the lower outlier threshold
+                if tempSupertileVals[i][j] < min and tempSupertileVals[i][j] > outlierLowerThreshold:
                     min = tempSupertileVals[i][j]
 
         # offset is the value to remove from the supertile so we don't have a bunch of extra
@@ -210,7 +214,10 @@ for supertileFileRow in supertileFiles:
             for j in range(len(tempSupertileVals[0])):
                 tempSupertileVals[i][j] -= offset
                 # throw out outliers
-                if tempSupertileVals[i][j] > outlierThreshold:
+                if tempSupertileVals[i][j] > outlierUpperThreshold:
+                    tempSupertileVals[i][j] = 0
+                # fix any values that were brought below zero by the offset
+                if tempSupertileVals[i][j] < 0:
                     tempSupertileVals[i][j] = 0
     
         # save the supertile .dat
