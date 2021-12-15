@@ -2,8 +2,9 @@
 
 # Author: Dustin Richards <richards.dustinb@gmail.com>
 # March 1, 2021
-# Extracts elevation data from a TIF file
-# version 1.4
+# Extracts elevation data from a grid of TIF files and generates 3D models
+#  using OpenSCAD
+# version 1.5, idk I'm bad at versioning
 
 # assumes unsigned 16-bit gray .tif files
 
@@ -13,7 +14,7 @@
 #  your favorite spreadsheet software should be able to generate this with the help of some functions
 
 # usage:
-# python3 get-elev.py grid_file [directory with .tif files]
+# python3 generate-models.py grid_file [directory with .tif files]
 
 from PIL import Image
 from glob import glob
@@ -44,7 +45,7 @@ outlierLowerThreshold = 100
 # ==== END OF USER DEFINED VARIABLES ====
 
 def printUsage():
-    print("Usage: ./get-elev.py grid_file [input_directory]")
+    print("Usage:", sys.argv[0], "grid_file [input_directory]")
     print("See comments in script for details on how grid_file should be structured")
     print("input_directory should be a directory containing 16-bit gray .tif files")
     print("Files listed in grid_file MUST be in input_directory")
