@@ -237,6 +237,3 @@ for supertileFileRow in supertileFiles:
             "-D", infileArg,
             "dat2stl.scad"])
         print("Done!")
-
-        # run OpenSCAD to generate a legs stl
-        print("Generating 3D model for legs...")
