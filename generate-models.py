@@ -4,7 +4,6 @@
 # March 1, 2021
 # Extracts elevation data from a grid of TIF files and generates 3D models
 #  using OpenSCAD
-# version 1.5, idk I'm bad at versioning
 
 # assumes unsigned 16-bit gray .tif files
 
@@ -231,7 +230,7 @@ for supertileFileRow in supertileFiles:
         supertileXArg = "supertile_x=" + str(supertileTilesX)
         supertileYArg = "supertile_y=" + str(supertileTilesY)
         infileArg     = "infile=\"" + supertileBaseName + ".dat\""
-        subprocess.run(["openscad-nightly", 
+        subprocess.run(["openscad", 
             "-o", outfileArg,
             "-D", supertileXArg,
             "-D", supertileYArg,
